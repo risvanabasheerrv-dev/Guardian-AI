@@ -1,0 +1,44 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment secrets — NEVER commit
+.env
+serviceAccountKey.json
+*.key
+*.pem
+*.pfx
+
+# Runtime data (persisted locally, excluded from image/repo)
+data/
+logs/
+temp/
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc / Debug / Binaries
+*.log
+.firebase/
+firebase-debug.log
+test_*.js
+!test_all.js
+fix_db.js
+print_routes.js
+routes.txt
+routes_utf8.txt
+test_results.txt
+e2e_error.txt
+ngrok.exe
+.gemini/
+brain/

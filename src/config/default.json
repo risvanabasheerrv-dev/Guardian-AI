@@ -1,0 +1,55 @@
+{
+  "agents": {
+    "contextEngine": {
+      "enabled": true,
+      "wikiPageLimit": 5,
+      "cacheExpiryMinutes": 60
+    },
+    "securityAuditor": {
+      "enabled": true,
+      "severityThreshold": "low",
+      "autoPostSuggestions": true,
+      "checkCVEs": true
+    },
+    "docsGuardian": {
+      "enabled": true,
+      "autoUpdate": true,
+      "appendChangelog": true
+    },
+    "riskScorer": {
+      "enabled": true,
+      "weights": {
+        "critical": 40,
+        "high": 20,
+        "medium": 8,
+        "low": 2
+      }
+    },
+    "greenSentinel": {
+      "enabled": true,
+      "minutesPerPipeline": 6,
+      "gramsPerMinute": 0.4
+    },
+    "actionAgent": {
+      "enabled": true,
+      "postDashboardComment": true,
+      "sendEmail": true,
+      "applyLabels": true
+    }
+  },
+  "risk": {
+    "autoApproveThreshold": 30,
+    "reviewThreshold": 70,
+    "blockThreshold": 70
+  },
+  "labels": {
+    "cleared": "guardian:cleared",
+    "reviewRequired": "guardian:review-required",
+    "blocked": "guardian:blocked"
+  },
+  "rateLimits": {
+    "webhookPerWindow": 100,
+    "authPerWindow": 5,
+    "apiPerWindow": 200
+  }
+}

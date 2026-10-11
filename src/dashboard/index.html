@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardian AI — Dashboard</title>
+  <link rel="stylesheet" href="/dashboard/style.css">
+
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <meta property="og:title" content="Guardian AI">
+  <meta property="og:description" content="Autonomous AI security reviews on every GitLab MR">
+  <meta property="og:image" content="/og-image.png">
+  <meta property="twitter:card" content="summary_large_image">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-icon">⚡</div>
+      <span class="logo-text">Guardian AI</span>
+      <span class="logo-badge">AI</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-status">
+        <div class="dot"></div>
+        <span id="statusText">Live</span>
+      </div>
+      <a href="/green" target="_blank">
+        <button class="btn btn-ghost">🌱 Green</button>
+      </a>
+      <button class="btn btn-ghost" id="logoutBtn">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h1>MR Analysis Dashboard</h1>
+      <p>Autonomous security reviews across all your GitLab projects</p>
+    </div>
+
+    <!-- WEBHOOK BANNER -->
+    <div id="webhookBanner" style="
+      display:none;
+      background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(61,214,140,0.04));
+      border: 1px solid rgba(124,106,247,0.2); border-left: 3px solid #7c6af7;
+      border-radius: 12px; padding: 14px 20px; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    ">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c6af7;white-space:nowrap">🌐 Webhook URL</span>
+      <code id="webhookBannerUrl" style="flex:1;min-width:200px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#3dd68c;word-break:break-all"></code>
+      <button id="copyUrlBtn" style="padding:6px 14px;background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.2);color:#7c6af7;font-size:12px;font-weight:600;font-family:inherit;border-radius:7px;cursor:pointer">📋 Copy</button>
+      <a href="/setup" style="padding:6px 14px;background:rgba(61,214,140,0.1);border:1px solid rgba(61,214,140,0.2);color:#3dd68c;font-size:12px;font-weight:600;border-radius:7px;text-decoration:none">Setup Guide →</a>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics-grid">
+      <div class="metric-card blue-card">
+        <div class="metric-icon blue">🔍</div>
+        <div class="metric-value blue" id="totalMRs">—</div>
+        <div class="metric-label">MRs Analyzed</div>
+        <div class="metric-sub">Total all time</div>
+      </div>
+
+      <div class="metric-card red-card">
+        <div class="metric-icon red">🔐</div>
+        <div class="metric-value red" id="totalFindings">—</div>
+        <div class="metric-label">Issues Caught</div>
+        <div class="metric-sub">All severity levels</div>
+      </div>
+
+      <div class="metric-card yellow-card">
+        <div class="metric-icon yellow">🚨</div>
+        <div class="metric-value yellow" id="criticalFindings">—</div>
+        <div class="metric-label">Critical Findings</div>
+        <div class="metric-sub">Require immediate attention</div>
+      </div>
+
+      <div class="metric-card green-card">
+        <div class="metric-icon green">🌍</div>
+        <div class="metric-value green" id="co2Saved">—</div>
+        <div class="metric-label">CO₂ Avoided</div>
+        <div class="metric-sub">grams of CO₂</div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- TERMINAL -->
+    <div class="section" id="terminalSection" style="display:none; margin-bottom:24px; border-color: rgba(61,214,140,0.3); box-shadow: 0 4px 24px rgba(61,214,140,0.05);">
+      <div class="section-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 16px;">
+        <div class="section-title" style="display:flex; align-items:center;">
+          <span style="display:inline-block; width:10px; height:10px; background:#3dd68c; border-radius:50%; margin-right:8px; box-shadow:0 0 8px #3dd68c; animation: pulse 1.5s infinite;"></span>
+          <span style="color:#3dd68c; font-weight:700; font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Live Execution · !</span><span id="activeRunTitle" style="color:#3dd68c; font-weight:700; font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:1px;"></span>
+        </div>
+      </div>
+      <div id="terminalBody" style="background:#0a0a0c; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:16px; font-family:'JetBrains Mono', monospace; font-size:12px; color:#a1a1aa; line-height:1.6; max-height:300px; overflow-y:auto; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
+      </div>
+    </div>
+    <style>@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }</style>
+
+    <!-- TABLE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          📊 Recent MR Analyses
+          <span class="count" id="runCount">—</span>
+        </div>
+        <div class="section-actions">
+          <button class="refresh-btn" id="refreshBtn" title="Refresh">↻</button>
+        </div>
+      </div>
+
+      <div id="tableContainer">
+        <div class="empty-state">
+          <div class="empty-icon">⚡</div>
+          <p>Loading analyses...</p>
+        </div>
+      </div>
+
+      <div class="table-footer">
+        <div class="footer-stat">Docs Updated: <span id="docsUpdated">—</span></div>
+        <div class="footer-stat">Auto-fixes: <span id="autoFixes">—</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/dashboard/app.js"></script>
+</body>
+</html>
